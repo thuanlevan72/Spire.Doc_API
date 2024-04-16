@@ -11,6 +11,8 @@ namespace WebApplication7.ViewModel
 
         public string NgaySinh { get; set; }
 
+        public string ThongTinNguoiNha {  get; set; }
+
         public int Tuoi { get; set; }
 
         public DateTime ThoiGianBatDauKham {  get; set; }= DateTime.Now;

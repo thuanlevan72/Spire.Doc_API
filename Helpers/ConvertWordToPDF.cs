@@ -9,6 +9,8 @@ using WebApplication7.ViewModel;
 using Spire.Barcode;
 using System.Drawing;
 using System;
+using System.Globalization;
+
 
 
 
@@ -58,6 +60,20 @@ namespace WebApplication7.Helpers
             return noiDung.ToString();
         }
 
+        private Image CreateBarcode(string code)
+        {
+            BarcodeSettings settings = new BarcodeSettings();
+            settings.Type = BarCodeType.Code25;
+            settings.Data = code;
+            settings.ShowTopText = false;
+            settings.ShowTextOnBottom = true;
+
+            //settings.ImageWidth = 10;
+            //settings.ImageHeight = 5;
+            BarCodeGenerator generator = new BarCodeGenerator(settings);
+            Image barcodeImg = generator.GenerateImage();
+            return barcodeImg;
+        }
         public byte[] ReplaceTextInWord(PhieuKhamBenhViewModel data, string path)
         {
             var configuration = _builder.Build();
@@ -73,28 +89,28 @@ namespace WebApplication7.Helpers
             string noiDungChuanDoanSoBo = GetListString(data.ChuanDoanSoBo);
             string noiDungCacBoPhan = GetListString(data.KhamLamSan.CacBoPhan);
             _doc.LoadFromFile(path);
-            BarcodeSettings settings = new BarcodeSettings();
-            settings.Type = BarCodeType.Code128;
-            settings.Data = Guid.NewGuid().ToString();
-            BarCodeGenerator generator = new BarCodeGenerator(settings);
-            Image barcodeImg = generator.GenerateImage();
-
-            // đang hơi chưa biết nên đã hash code
-            //_doc.Replace(PhieuKhamBenhKEY.TEN_SO_Y_TE, hashData["SoYTE"], false, true);
-            //TextSelection[] selections = _doc.FindAllString("${barcodeImg}", false, true);
-            //foreach (TextSelection local in selections)
-            //{
-            //    TextRange rangeIndex = local.GetAsOneRange();
-            //    Paragraph para = rangeIndex.OwnerParagraph;
-            //    int index = para.ChildObjects.IndexOf(rangeIndex);
-            //    DocPicture picture = para.AppendPicture(barcodeImg);
          
-            //    picture.Width = 50; // Sửa độ rộng ảnh
-            //    picture.Height = 30; // Sửa độ cao ảnh
-            //    picture.TextWrappingStyle = TextWrappingStyle.InFrontOfText;
-            //    para.ChildObjects.Insert(index, picture);
-            //    para.ChildObjects.Remove(rangeIndex);
-            //}
+            Image barcodeImg = CreateBarcode(data.MA_NB);
+
+
+            //đang hơi chưa biết nên đã hash code
+            _doc.Replace(PhieuKhamBenhKEY.TEN_SO_Y_TE, hashData["SoYTE"], false, true);
+            TextSelection[] selections = _doc.FindAllString("${Image_Barcode}", false, true);
+            foreach (TextSelection local in selections)
+            {
+                TextRange rangeIndex = local.GetAsOneRange();
+                Paragraph para = rangeIndex.OwnerParagraph;
+               
+                int index = para.ChildObjects.IndexOf(rangeIndex);
+                
+                DocPicture picture = para.AppendPicture(barcodeImg);
+                picture.TextWrappingType = TextWrappingType.Left;
+                //picture.TextWrappingStyle = TextWrappingStyle.InFrontOfText;
+                
+     
+                para.ChildObjects.Insert(index, picture);
+                para.ChildObjects.Remove(rangeIndex);
+            }
             _doc.Replace(PhieuKhamBenhKEY.NOI_LAM_VIEC, data.NoiLamViec, false, true);
             _doc.Replace(PhieuKhamBenhKEY.DIA_CHI,data.DiaChi , false, true);
             _doc.Replace(PhieuKhamBenhKEY.NGAY_SINH, data.NgaySinh, false, true);
@@ -110,7 +126,7 @@ namespace WebApplication7.Helpers
             _doc.Replace(PhieuKhamBenhKEY.THOI_GIAN_DEN_KHAM, data.ThoiGianDenKham.ToString("'ngày 'dd' tháng 'MM' năm 'yyyy', 'HH' giờ 'mm' phút'"), false, true);
             _doc.Replace(PhieuKhamBenhKEY.THOI_GIAN_DEN_KHAM, data.ThoiGianBatDauKham.ToString("'ngày 'dd' tháng 'MM' năm 'yyyy', 'HH' giờ 'mm' phút'"), false, true);
             _doc.Replace(PhieuKhamBenhKEY.THOI_GIAN_BAT_DAU_KHAM, noiDungGhiChu.ToString(), false, true);
-            _doc.Replace(PhieuKhamBenhKEY.NGAY_TAO, data.NgayTaoDon.ToString("'dd' tháng 'MM' năm 'yyyy'"), false, true);
+            _doc.Replace(PhieuKhamBenhKEY.NGAY_TAO, data.NgayTaoDon.ToString("'Ngày' dd 'tháng' MM 'năm' yyyy", new CultureInfo("vi-VN")), false, true);
             _doc.Replace(PhieuKhamBenhKEY.KHAM_TOAN_THAN, data.KhamLamSan.ToanThan, false, true);
             _doc.Replace(PhieuKhamBenhKEY.LY_DO_KHAM_BENH, data.LyDoDenKham, false, true);
             _doc.Replace(PhieuKhamBenhKEY.TIEN_SU_BAN_THAN, GetListString(data.TienSuBenh.TienSuBanThan), false, true);
@@ -125,6 +141,7 @@ namespace WebApplication7.Helpers
             _doc.Replace(PhieuKhamBenhKEY.NOI_DUNG_SU_CHI, data.NoiDungSuLy, false, true);
             _doc.Replace(PhieuKhamBenhKEY.KHAM_BO_PHAN, noiDungCacBoPhan, false, true);
             _doc.Replace(PhieuKhamBenhKEY.TOM_TAC_KET_QUA, data.TomtacKetQua, false, true);
+            _doc.Replace(PhieuKhamBenhKEY.THONG_TIN_NGUOI_NHA, data.ThongTinNguoiNha, false, true);
             _doc.Replace(PhieuKhamBenhKEY.GIOI_TINH, data.GioiTinh == true ? "Nữ" : "Nam", false, true);
             //
             _doc.Replace(PhieuKhamBenhKEY.BMI, data.ThongSoSucKhoe.BMI.ToString(), false, true);
@@ -168,7 +185,8 @@ namespace WebApplication7.Helpers
             _doc.Dispose();
 
             string fileName = @"Document-" + DateTime.Now.ToString("dd-MM-yyyy") + "-" + Guid.NewGuid().ToString() + @"-Converted.pdf";
-            string directoryPath = @"C:\Users\Admin\Source\Repos\Spire.Doc_API\PDFResult\"; // Thay thế bằng đường dẫn thư mục mà bạn muốn lưu file vào
+            //string directoryPath = @"C:\Users\Admin\Source\Repos\Spire.Doc_API\PDFResult\"; // Thay thế bằng đường dẫn thư mục mà bạn muốn lưu file vào
+            string directoryPath = @"C:\Users\thuan\source\repos\WebApplication7\WebApplication7\PDFResult\";
             string fullPath = Path.Combine(directoryPath, fileName);
 
             // Lưu file vào thư mục

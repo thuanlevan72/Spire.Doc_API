@@ -96,8 +96,8 @@
   },
   {
     "ContainingType": "WebApplication7.Controllers.RenderPDFController",
-    "Method": "GetPhieuKhamBenh",
-    "RelativePath": "api/RenderPDF/GetPhieuKhamBenh",
+    "Method": "RenderPhieuKhamBenh",
+    "RelativePath": "api/RenderPDF/PhieuKhamBenh",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
