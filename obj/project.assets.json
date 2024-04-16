@@ -2,6 +2,23 @@
   "version": 3,
   "targets": {
     "net7.0": {
+      "FreeSpire.Barcode/6.6.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Drawing.Common": "6.0.0",
+          "System.Text.Encoding.CodePages": "6.0.0"
+        },
+        "compile": {
+          "lib/net6.0/Spire.Barcode.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Spire.Barcode.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "FreeSpire.Doc/12.2.0": {
         "type": "package",
         "dependencies": {
@@ -456,6 +473,27 @@
     }
   },
   "libraries": {
+    "FreeSpire.Barcode/6.6.0": {
+      "sha512": "q3zcUS83luETbc/rSQuuGhf3oSJewBjXsJYts8VD+tHpy5UBbIVwps/KZS+vO23mWd237MOSeSrepv4txz4szQ==",
+      "type": "package",
+      "path": "freespire.barcode/6.6.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "freespire.barcode.6.6.0.nupkg.sha512",
+        "freespire.barcode.nuspec",
+        "lib/MonoAndroid/Spire.Barcode.dll",
+        "lib/MonoAndroid/Spire.Barcode.xml",
+        "lib/net40/Spire.Barcode.dll",
+        "lib/net40/Spire.Barcode.xml",
+        "lib/net6.0/Spire.Barcode.dll",
+        "lib/net6.0/Spire.Barcode.xml",
+        "lib/netcoreapp2.0/Spire.Barcode.dll",
+        "lib/netcoreapp2.0/Spire.Barcode.xml",
+        "lib/xamarinios/Spire.Barcode.dll",
+        "lib/xamarinios/Spire.Barcode.xml"
+      ]
+    },
     "FreeSpire.Doc/12.2.0": {
       "sha512": "qqc9tf1utZAQoQPfOFUXTXT0C27XZAqathA8/8jk991r/fi/NlpG5wQFgWJZ6v2zFftouuaRI7jby0pjPCjaKw==",
       "type": "package",
@@ -1301,6 +1339,7 @@
   },
   "projectFileDependencyGroups": {
     "net7.0": [
+      "FreeSpire.Barcode >= 6.6.0",
       "FreeSpire.Doc >= 12.2.0",
       "FreeSpire.PDF >= 10.2.0",
       "Microsoft.AspNetCore.OpenApi >= 7.0.15",
@@ -1313,11 +1352,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Admin\\Source\\Repos\\Spire.Doc_API\\WebApplication7.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\source\\repos\\Spire.Doc_API\\WebApplication7.csproj",
       "projectName": "WebApplication7",
-      "projectPath": "C:\\Users\\Admin\\Source\\Repos\\Spire.Doc_API\\WebApplication7.csproj",
+      "projectPath": "C:\\Users\\Admin\\source\\repos\\Spire.Doc_API\\WebApplication7.csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Admin\\Source\\Repos\\Spire.Doc_API\\obj\\",
+      "outputPath": "C:\\Users\\Admin\\source\\repos\\Spire.Doc_API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -1352,6 +1391,10 @@
       "net7.0": {
         "targetAlias": "net7.0",
         "dependencies": {
+          "FreeSpire.Barcode": {
+            "target": "Package",
+            "version": "[6.6.0, )"
+          },
           "FreeSpire.Doc": {
             "target": "Package",
             "version": "[12.2.0, )"

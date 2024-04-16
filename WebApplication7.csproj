@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FreeSpire.Barcode" Version="6.6.0" />
     <PackageReference Include="FreeSpire.Doc" Version="12.2.0" />
     <PackageReference Include="FreeSpire.PDF" Version="10.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.15" />

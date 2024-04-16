@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v7.0": {
       "WebApplication7/1.0.0": {
         "dependencies": {
+          "FreeSpire.Barcode": "6.6.0",
           "FreeSpire.Doc": "12.2.0",
           "FreeSpire.PDF": "10.2.0",
           "Microsoft.AspNetCore.OpenApi": "7.0.15",
@@ -15,6 +16,18 @@
         },
         "runtime": {
           "WebApplication7.dll": {}
+        }
+      },
+      "FreeSpire.Barcode/6.6.0": {
+        "dependencies": {
+          "System.Drawing.Common": "6.0.0",
+          "System.Text.Encoding.CodePages": "6.0.0"
+        },
+        "runtime": {
+          "lib/net6.0/Spire.Barcode.dll": {
+            "assemblyVersion": "6.6.0.0",
+            "fileVersion": "6.6.0.9020"
+          }
         }
       },
       "FreeSpire.Doc/12.2.0": {
@@ -274,6 +287,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "FreeSpire.Barcode/6.6.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-q3zcUS83luETbc/rSQuuGhf3oSJewBjXsJYts8VD+tHpy5UBbIVwps/KZS+vO23mWd237MOSeSrepv4txz4szQ==",
+      "path": "freespire.barcode/6.6.0",
+      "hashPath": "freespire.barcode.6.6.0.nupkg.sha512"
     },
     "FreeSpire.Doc/12.2.0": {
       "type": "package",

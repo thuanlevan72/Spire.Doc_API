@@ -107,3 +107,4 @@ C:\Users\Admin\Source\Repos\Spire.Doc_API\obj\Debug\net7.0\refint\WebApplication
 C:\Users\Admin\Source\Repos\Spire.Doc_API\obj\Debug\net7.0\WebApplication7.pdb
 C:\Users\Admin\Source\Repos\Spire.Doc_API\obj\Debug\net7.0\WebApplication7.genruntimeconfig.cache
 C:\Users\Admin\Source\Repos\Spire.Doc_API\obj\Debug\net7.0\ref\WebApplication7.dll
+C:\Users\Admin\source\repos\Spire.Doc_API\bin\Debug\net7.0\Spire.Barcode.dll

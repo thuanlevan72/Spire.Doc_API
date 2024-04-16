@@ -6,6 +6,9 @@ using Spire.Doc.Fields;
 using System.Text;
 using WebApplication7.Commons;
 using WebApplication7.ViewModel;
+using Spire.Barcode;
+using System.Drawing;
+using System;
 
 
 
@@ -69,10 +72,29 @@ namespace WebApplication7.Helpers
             });
             string noiDungChuanDoanSoBo = GetListString(data.ChuanDoanSoBo);
             string noiDungCacBoPhan = GetListString(data.KhamLamSan.CacBoPhan);
-
             _doc.LoadFromFile(path);
+            BarcodeSettings settings = new BarcodeSettings();
+            settings.Type = BarCodeType.Code128;
+            settings.Data = Guid.NewGuid().ToString();
+            BarCodeGenerator generator = new BarCodeGenerator(settings);
+            Image barcodeImg = generator.GenerateImage();
+
             // đang hơi chưa biết nên đã hash code
-            _doc.Replace(PhieuKhamBenhKEY.TEN_SO_Y_TE, hashData["SoYTE"], false, true);
+            //_doc.Replace(PhieuKhamBenhKEY.TEN_SO_Y_TE, hashData["SoYTE"], false, true);
+            //TextSelection[] selections = _doc.FindAllString("${barcodeImg}", false, true);
+            //foreach (TextSelection local in selections)
+            //{
+            //    TextRange rangeIndex = local.GetAsOneRange();
+            //    Paragraph para = rangeIndex.OwnerParagraph;
+            //    int index = para.ChildObjects.IndexOf(rangeIndex);
+            //    DocPicture picture = para.AppendPicture(barcodeImg);
+         
+            //    picture.Width = 50; // Sửa độ rộng ảnh
+            //    picture.Height = 30; // Sửa độ cao ảnh
+            //    picture.TextWrappingStyle = TextWrappingStyle.InFrontOfText;
+            //    para.ChildObjects.Insert(index, picture);
+            //    para.ChildObjects.Remove(rangeIndex);
+            //}
             _doc.Replace(PhieuKhamBenhKEY.NOI_LAM_VIEC, data.NoiLamViec, false, true);
             _doc.Replace(PhieuKhamBenhKEY.DIA_CHI,data.DiaChi , false, true);
             _doc.Replace(PhieuKhamBenhKEY.NGAY_SINH, data.NgaySinh, false, true);
@@ -99,13 +121,11 @@ namespace WebApplication7.Helpers
             _doc.Replace(PhieuKhamBenhKEY.TDCN, data.ChiDinhCanLamSan.ChuanDoanHinhAnh, false, true);
             _doc.Replace(PhieuKhamBenhKEY.NGUOI_LAP_DON, data.NguoiLapDon, false, true);
             _doc.Replace(PhieuKhamBenhKEY.NGUOI_GIOI_THIEU, data.NguoiGioiThieu, false, true);
-
             _doc.Replace(PhieuKhamBenhKEY.CHUAN_DOAN_SO_BO, noiDungChuanDoanSoBo, false, true);
             _doc.Replace(PhieuKhamBenhKEY.NOI_DUNG_SU_CHI, data.NoiDungSuLy, false, true);
             _doc.Replace(PhieuKhamBenhKEY.KHAM_BO_PHAN, noiDungCacBoPhan, false, true);
             _doc.Replace(PhieuKhamBenhKEY.TOM_TAC_KET_QUA, data.TomtacKetQua, false, true);
             _doc.Replace(PhieuKhamBenhKEY.GIOI_TINH, data.GioiTinh == true ? "Nữ" : "Nam", false, true);
-
             //
             _doc.Replace(PhieuKhamBenhKEY.BMI, data.ThongSoSucKhoe.BMI.ToString(), false, true);
             _doc.Replace(PhieuKhamBenhKEY.HUYET_AP, data.ThongSoSucKhoe.HuyetAp.ToString(), false, true);

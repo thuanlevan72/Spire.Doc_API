@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "YaaDWOErqOg=",
+  "dgSpecHash": "OXhmUBCHG28=",
   "success": true,
   "projectFilePath": "C:\\Users\\Admin\\source\\repos\\Spire.Doc_API\\WebApplication7.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Admin\\.nuget\\packages\\freespire.barcode\\6.6.0\\freespire.barcode.6.6.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\freespire.doc\\12.2.0\\freespire.doc.12.2.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\freespire.pdf\\10.2.0\\freespire.pdf.10.2.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\harfbuzzsharp\\2.6.1.5\\harfbuzzsharp.2.6.1.5.nupkg.sha512",
