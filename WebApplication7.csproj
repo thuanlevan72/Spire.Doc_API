@@ -15,8 +15,8 @@
 
   <ItemGroup>
     <Folder Include="DocxTemplates\" />
-    <Folder Include="Temp\" />
     <Folder Include="PDFResult\" />
+    <Folder Include="Temp\" />
   </ItemGroup>
 
 </Project>

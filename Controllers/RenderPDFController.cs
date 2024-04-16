@@ -33,20 +33,18 @@ namespace WebApplication7.Controllers
 
 
         // POST api/<RenderPDFController>
-        [HttpPost("GetPhieuKhamBenh")]
-        public IActionResult GetPhieuKhamBenh([FromBody] PhieuKhamBenhViewModel value)
+        [HttpPost("PhieuKhamBenh")]
+        public IActionResult RenderPhieuKhamBenh([FromBody] PhieuKhamBenhViewModel value)
         {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "DocxTemplates", "40. Phiếu khám bệnh.docx");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "DocxTemplates", "Phieu-kham-vao-vien-v2_20240416.docx");
             byte[] fileContent = _convertWordToPDF.ReplaceTextInWord(value, path);
 
 
-            var (fileData, fileName) = _convertWordToPDF.ConvertDocumentToPdf(fileContent);
+            var (memory, fileName) = _convertWordToPDF.ConvertDocumentToPdf(fileContent);
 
-            // Set up the response
-            Response.Headers["Content-Disposition"] = $"inline; filename={fileName}";
-
+         
             // Return the PDF file to the client.
-            return new FileContentResult(fileData, "application/pdf");
+            return File(memory, "application/pdf", fileName);
         }
 
         // PUT api/<RenderPDFController>/5
