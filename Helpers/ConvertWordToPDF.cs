@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+﻿
 using Spire.Doc;
 using Spire.Doc.Documents;
 using Spire.Doc.Fields;
@@ -10,6 +9,8 @@ using Spire.Barcode;
 using System.Drawing;
 using System;
 using System.Globalization;
+
+
 
 
 
@@ -63,56 +64,137 @@ namespace WebApplication7.Helpers
         private Image CreateBarcode(string code)
         {
             BarcodeSettings settings = new BarcodeSettings();
-            settings.Type = BarCodeType.Code25;
+            settings.Type = BarCodeType.Code128;
             settings.Data = code;
             settings.ShowTopText = false;
-            settings.ShowTextOnBottom = true;
-
-            //settings.ImageWidth = 10;
-            //settings.ImageHeight = 5;
+            settings.ShowText = false;
+            settings.ImageWidth = 10;
+            settings.ImageHeight = 10;
+            
             BarCodeGenerator generator = new BarCodeGenerator(settings);
             Image barcodeImg = generator.GenerateImage();
             return barcodeImg;
         }
-        public byte[] ReplaceTextInWord(PhieuKhamBenhViewModel data, string path)
+        private void HandleImages(TextSelection selection, Image image)
+        {
+            TextRange range = selection.GetAsOneRange();
+            Paragraph paragraph = range.OwnerParagraph;
+
+            int index = paragraph.ChildObjects.IndexOf(range);
+
+            Size size = new Size(200, 20);
+            Image processedImage = CropImageToFrame(image, size);
+
+            DocPicture picture = paragraph.AppendPicture(processedImage);
+            picture.TextWrappingType = TextWrappingType.Left;
+            picture.Height = size.Height;
+            picture.Width = size.Width;
+            picture.TextWrappingStyle = TextWrappingStyle.InFrontOfText;
+            picture.VerticalPosition = -2.0F;
+
+            paragraph.ChildObjects.Insert(index, picture);
+            paragraph.ChildObjects.Remove(range);
+        }
+        public static Image CropImageToFrame(Image img, Size size)
+        {
+            if (img.Height < size.Height && img.Width < size.Width)
+                return img;
+            Bitmap res = new Bitmap(size.Width, size.Height);
+            using (var g = Graphics.FromImage(res))
+            {
+                var scale = Math.Max((float)size.Width / img.Width, (float)size.Height / img.Height);
+                var scaleWidth = (int)(img.Width * scale);
+                var scaleHeight = (int)(img.Height * scale);
+                g.DrawImage(img, new Rectangle((size.Width - scaleWidth) / 2, (size.Height - scaleHeight) / 2, scaleWidth, scaleHeight));
+            }
+            return res;
+        }
+        public void HandleInsertCheckBox(PhieuKhamBenhViewModel data)
+        {
+            // find insert check box
+            TextSelection[] textSelections = _doc.FindAllString(PhieuKhamBenhKEY.CHECK_THUONG, true, true);
+            foreach (TextSelection textSelection in textSelections)
+            {
+                // Tạo hình ảnh mới từ file
+                DocPicture picture = new DocPicture(_doc);
+                if (data.CheckKhanCap)
+                {
+                    picture.LoadImage(Image.FromFile(Constants.UrlImageUnCheck));
+                }
+                else
+                {
+                    picture.LoadImage(Image.FromFile(Constants.UrlImageCheck));
+                }
+
+                // Đặt kiểu cho hình ảnh
+
+                picture.Width = 10;
+                picture.Height = 10;
+
+                // Lấy đoạn văn bản đang chứa textSelection
+                Paragraph paragraph = textSelection.GetAsOneRange().OwnerParagraph;
+
+                // Xác định vị trí của đoạn văn bản cần thay thế trong đoạn văn bản
+                int index = paragraph.ChildObjects.IndexOf(textSelection.GetAsOneRange());
+
+                // Thêm hình ảnh vào vị trí của đoạn văn bản cần thay thế
+                paragraph.ChildObjects.Insert(index, picture);
+
+                // Xóa đoạn văn bản cần thay thế
+                paragraph.ChildObjects.Remove(textSelection.GetAsOneRange());
+            }
+            // find insert check box khẩn cấp
+            TextSelection[] textSelectionhelp = _doc.FindAllString(PhieuKhamBenhKEY.CHECK_KHAN_CAP, true, true);
+            foreach (TextSelection textSelection in textSelectionhelp)
+            {
+                // Tạo hình ảnh mới từ file
+                DocPicture picture = new DocPicture(_doc);
+                if (!data.CheckKhanCap)
+                {
+                    picture.LoadImage(Image.FromFile(Constants.UrlImageUnCheck));
+                }
+                else
+                {
+                    picture.LoadImage(Image.FromFile(Constants.UrlImageCheck));
+                }
+
+                // Đặt kiểu cho hình ảnh
+
+                picture.Width = 10;
+                picture.Height = 10;
+
+
+                // Lấy đoạn văn bản đang chứa textSelection
+                Paragraph paragraph = textSelection.GetAsOneRange().OwnerParagraph;
+
+                // Xác định vị trí của đoạn văn bản cần thay thế trong đoạn văn bản
+                int index = paragraph.ChildObjects.IndexOf(textSelection.GetAsOneRange());
+
+                // Thêm hình ảnh vào vị trí của đoạn văn bản cần thay thế
+                paragraph.ChildObjects.Insert(index, picture);
+
+                // Xóa đoạn văn bản cần thay thế
+                paragraph.ChildObjects.Remove(textSelection.GetAsOneRange());
+            }
+        }
+        public void ReplaceTextInWord(PhieuKhamBenhViewModel data)
         {
             var configuration = _builder.Build();
             var hashData = configuration.GetSection("HashData");
 
             StringBuilder noiDungGhiChu = new StringBuilder();
-       
+
             data.GhiChus.ForEach(title =>
             {
                 noiDungGhiChu.Append($" {title} \n");
-             
+
             });
             string noiDungChuanDoanSoBo = GetListString(data.ChuanDoanSoBo);
             string noiDungCacBoPhan = GetListString(data.KhamLamSan.CacBoPhan);
-            _doc.LoadFromFile(path);
-         
-            Image barcodeImg = CreateBarcode(data.MA_NB);
-
-
-            //đang hơi chưa biết nên đã hash code
-            _doc.Replace(PhieuKhamBenhKEY.TEN_SO_Y_TE, hashData["SoYTE"], false, true);
-            TextSelection[] selections = _doc.FindAllString("${Image_Barcode}", false, true);
-            foreach (TextSelection local in selections)
-            {
-                TextRange rangeIndex = local.GetAsOneRange();
-                Paragraph para = rangeIndex.OwnerParagraph;
-               
-                int index = para.ChildObjects.IndexOf(rangeIndex);
-                
-                DocPicture picture = para.AppendPicture(barcodeImg);
-                picture.TextWrappingType = TextWrappingType.Left;
-                //picture.TextWrappingStyle = TextWrappingStyle.InFrontOfText;
-                
-     
-                para.ChildObjects.Insert(index, picture);
-                para.ChildObjects.Remove(rangeIndex);
-            }
+            _doc.Replace(PhieuKhamBenhKEY.SO_DIEN_THOAI_NGUOI_NHA, data.SoDienThoaiNguoiNha, false, true);
+            _doc.Replace(PhieuKhamBenhKEY.HAN_BAO_HIEM, data.HanBaoHiem.ToString("dd/MM/yyyy"), false, true);
             _doc.Replace(PhieuKhamBenhKEY.NOI_LAM_VIEC, data.NoiLamViec, false, true);
-            _doc.Replace(PhieuKhamBenhKEY.DIA_CHI,data.DiaChi , false, true);
+            _doc.Replace(PhieuKhamBenhKEY.DIA_CHI, data.DiaChi, false, true);
             _doc.Replace(PhieuKhamBenhKEY.NGAY_SINH, data.NgaySinh, false, true);
             _doc.Replace(PhieuKhamBenhKEY.DAN_TOC, data.DanToc, false, true);
             _doc.Replace(PhieuKhamBenhKEY.TEN_NGUOI_BENH, data.TenNguoiBenh, false, true);
@@ -122,13 +204,13 @@ namespace WebApplication7.Helpers
             _doc.Replace(PhieuKhamBenhKEY.MA_NB, data.MA_NB, false, true);// hash trước đã
             _doc.Replace(PhieuKhamBenhKEY.QUOC_TICH, data.QuocTich, false, true);
             _doc.Replace(PhieuKhamBenhKEY.TUOI, data.Tuoi.ToString(), false, true);
-            _doc.Replace(PhieuKhamBenhKEY.NOI_DUNG_GHI_CHU,noiDungGhiChu.ToString(), false, true);
-            _doc.Replace(PhieuKhamBenhKEY.THOI_GIAN_DEN_KHAM, data.ThoiGianDenKham.ToString("'ngày 'dd' tháng 'MM' năm 'yyyy', 'HH' giờ 'mm' phút'"), false, true);
-            _doc.Replace(PhieuKhamBenhKEY.THOI_GIAN_DEN_KHAM, data.ThoiGianBatDauKham.ToString("'ngày 'dd' tháng 'MM' năm 'yyyy', 'HH' giờ 'mm' phút'"), false, true);
+            _doc.Replace(PhieuKhamBenhKEY.NOI_DUNG_GHI_CHU, noiDungGhiChu.ToString(), false, true);
+            _doc.Replace(PhieuKhamBenhKEY.THOI_GIAN_DEN_KHAM, data.ThoiGianDenKham.ToString(Constants.TimeFormat), false, true);
+            _doc.Replace(PhieuKhamBenhKEY.THOI_GIAN_BAT_DAU_KHAM, data.ThoiGianBatDauKham.ToString(Constants.TimeFormat), false, true);
             _doc.Replace(PhieuKhamBenhKEY.THOI_GIAN_BAT_DAU_KHAM, noiDungGhiChu.ToString(), false, true);
-            _doc.Replace(PhieuKhamBenhKEY.NGAY_TAO, data.NgayTaoDon.ToString("'Ngày' dd 'tháng' MM 'năm' yyyy", new CultureInfo("vi-VN")), false, true);
+            _doc.Replace(PhieuKhamBenhKEY.NGAY_TAO, data.NgayTaoDon.ToString(Constants.DateFormat, new CultureInfo("vi-VN")), false, true);
             _doc.Replace(PhieuKhamBenhKEY.KHAM_TOAN_THAN, data.KhamLamSan.ToanThan, false, true);
-            _doc.Replace(PhieuKhamBenhKEY.LY_DO_KHAM_BENH, data.LyDoDenKham, false, true);
+            _doc.Replace(PhieuKhamBenhKEY.LY_DO_KHAM_BENH, data.LyDoKhanhBenh, false, true);
             _doc.Replace(PhieuKhamBenhKEY.TIEN_SU_BAN_THAN, GetListString(data.TienSuBenh.TienSuBanThan), false, true);
             _doc.Replace(PhieuKhamBenhKEY.TIEN_SU_GIA_DINH, GetListString(data.TienSuBenh.TienSuGiaDinh), false, true);
             _doc.Replace(PhieuKhamBenhKEY.BENH_SU, data.BenhSu, false, true);
@@ -143,7 +225,6 @@ namespace WebApplication7.Helpers
             _doc.Replace(PhieuKhamBenhKEY.TOM_TAC_KET_QUA, data.TomtacKetQua, false, true);
             _doc.Replace(PhieuKhamBenhKEY.THONG_TIN_NGUOI_NHA, data.ThongTinNguoiNha, false, true);
             _doc.Replace(PhieuKhamBenhKEY.GIOI_TINH, data.GioiTinh == true ? "Nữ" : "Nam", false, true);
-            //
             _doc.Replace(PhieuKhamBenhKEY.BMI, data.ThongSoSucKhoe.BMI.ToString(), false, true);
             _doc.Replace(PhieuKhamBenhKEY.HUYET_AP, data.ThongSoSucKhoe.HuyetAp.ToString(), false, true);
             _doc.Replace(PhieuKhamBenhKEY.MANH_DAP, data.ThongSoSucKhoe.ManhDap.ToString(), false, true);
@@ -152,25 +233,33 @@ namespace WebApplication7.Helpers
             _doc.Replace(PhieuKhamBenhKEY.NHIP_THO, data.ThongSoSucKhoe.NhipTho.ToString(), false, true);
             _doc.Replace(PhieuKhamBenhKEY.CHIEU_CAO, data.ThongSoSucKhoe.ChieuCao.ToString(), false, true);
             _doc.Replace(PhieuKhamBenhKEY.SP02, data.ThongSoSucKhoe.SPO2.ToString(), false, true);
-            //
-            TextSelection selection = _doc.FindString(PhieuKhamBenhKEY.TEN_BENH_VIEN, false, true);
-            TextRange range = selection.GetAsOneRange();
+            _doc.Replace(PhieuKhamBenhKEY.NOI_DUNG_GHI_CHU, noiDungGhiChu.ToString(), false, true);
+            _doc.Replace(PhieuKhamBenhKEY.TEN_SO_Y_TE, Constants.SoYTE, false, true);
+            _doc.Replace(PhieuKhamBenhKEY.TEN_BENH_VIEN, Constants.TenBenhVien, false, true);
+        }
+        public byte[] ReplaceTextInWord(PhieuKhamBenhViewModel data, string path)
+        {
+            var configuration = _builder.Build();
+            var hashData = configuration.GetSection("HashData");
+            
+            _doc.LoadFromFile(path);
+         
+            Image barcodeImg = CreateBarcode(data.MA_NB);
+            TextSelection[] selections = _doc.FindAllString("${Image_Barcode}", false, true);
+            HandleImages(selections[0], barcodeImg);
+            HandleInsertCheckBox(data);
+            // Replace Text In Word
+            ReplaceTextInWord(data);
+            AddTableToDoc(PhieuKhamBenhKEY.TABLE_BENH_CHINH,data.chanDoanXacDinh);
+            using (MemoryStream stream = new MemoryStream())
+            {
+                _doc.SaveToStream(stream, FileFormat.Docx2016);
+                byte[] result = stream.ToArray();
 
-            range.CharacterFormat.UnderlineStyle = UnderlineStyle.Single;
-            range.Text = hashData["TenBenhVien"];
+                _doc.Close();
 
-            _doc.Replace("${NOIDUNGGHICHU}", noiDungGhiChu.ToString(), false, true);
-            //_doc.Replace("${BENH_KEM_THEO}", noiDungGhiChu.ToString(), false, true);
-            //AddTable();
-            AddTableToDoc("${TableBenhChinh}",data.chanDoanXacDinh);
-
-            MemoryStream stream = new MemoryStream();
-            _doc.SaveToStream(stream, FileFormat.Docx2016);
-            byte[] result = stream.ToArray();
-
-            _doc.Close();
-
-            return result;
+                return result;
+            }
         }
         #region chuyển file DOCX SANG Pdf
         public (MemoryStream, string) ConvertDocumentToPdf(byte[] fileData)
@@ -185,8 +274,8 @@ namespace WebApplication7.Helpers
             _doc.Dispose();
 
             string fileName = @"Document-" + DateTime.Now.ToString("dd-MM-yyyy") + "-" + Guid.NewGuid().ToString() + @"-Converted.pdf";
-            //string directoryPath = @"C:\Users\Admin\Source\Repos\Spire.Doc_API\PDFResult\"; // Thay thế bằng đường dẫn thư mục mà bạn muốn lưu file vào
-            string directoryPath = @"C:\Users\thuan\source\repos\WebApplication7\WebApplication7\PDFResult\";
+            string directoryPath = @"C:\Users\Admin\Source\Repos\Spire.Doc_API\PDFResult\"; // Thay thế bằng đường dẫn thư mục mà bạn muốn lưu file vào
+            //string directoryPath = @"C:\Users\thuan\source\repos\WebApplication7\WebApplication7\PDFResult\";
             string fullPath = Path.Combine(directoryPath, fileName);
 
             // Lưu file vào thư mục
@@ -200,20 +289,13 @@ namespace WebApplication7.Helpers
             return (memory, fileName);
         }
         #endregion
-
-
         private void AddTableToDoc(string placeholder, ChanDoanXacDinh inputData)
         {
-            String[] Header = { $"Bệnh chính: {inputData.BenhChinh.TenBenh}", $"Mã ICD: {inputData.BenhChinh.ICD_CODE}" };
-            //String[][] data = {
-            //          new String[]{ "Bệnh kèm theo: ", null},
-            //          new String[]{ "Aceton niệu Bệnh kèm theo", "Mã ICD: R82.4"},
-            //          new String[]{ "Acidoniu Bệnh kèm theo", "Mã ICD: R82.4"},
-            //      };
+            String[] Header = { $"- Bệnh chính: {inputData.BenhChinh.TenBenh}", $"Mã ICD: {inputData.BenhChinh.ICD_CODE}" };
 
             List<String[]> tempList = new List<string[]>()
             {
-                new String[] { "Bệnh kèm theo: ", null }
+                new String[] { "- Bệnh kèm theo: ", null }
             };
             for (int i = 0;i< inputData.benhPhu.Count; i++)
             {
@@ -224,6 +306,8 @@ namespace WebApplication7.Helpers
             TextSelection selection = _doc.FindString(placeholder, false, true);
             TextRange range = selection.GetAsOneRange();
 
+
+
             Table table = range.OwnerParagraph.OwnerTextBody.AddTable(true);
 
             table.ResetCells(data.Length + 1, Header.Length);
@@ -232,15 +316,13 @@ namespace WebApplication7.Helpers
 
             FRow.Height = 23;
  
-
-            // Set the width for the cells
             FRow.Cells[0].Width = (float)(table.Width * 0.7);
             FRow.Cells[1].Width = (float)(table.Width * 0.3);
 
             for (int i = 0; i < Header.Length; i++)
             {
                 Paragraph p = FRow.Cells[i].AddParagraph();
-                FRow.Cells[i].CellFormat.VerticalAlignment = VerticalAlignment.Middle;
+                FRow.Cells[i].CellFormat.VerticalAlignment = VerticalAlignment.Top;
                 p.Format.HorizontalAlignment = HorizontalAlignment.Left;
 
                 TextRange TR = p.AppendText(Header[i]);
@@ -252,9 +334,9 @@ namespace WebApplication7.Helpers
             for (int r = 0; r < data.Length; r++)
             {
                 TableRow DataRow = table.Rows[r + 1];
-                DataRow.Height = 20;
+                DataRow.Height = 15;
 
-                // Set the width for the cells
+              
                 DataRow.Cells[0].Width = (float)(table.Width * 0.7);
                 DataRow.Cells[1].Width = (float)(table.Width * 0.3);
 
@@ -263,18 +345,26 @@ namespace WebApplication7.Helpers
                     table.Rows[r].Cells[c].CellFormat.Borders.BorderType = Spire.Doc.Documents.BorderStyle.None;
                     DataRow.Cells[c].CellFormat.VerticalAlignment = VerticalAlignment.Middle;
                     Paragraph p2 = DataRow.Cells[c].AddParagraph();
-                    // check if the cell data is not null before appending it
+                   
                     if (data[r][c] != null)
                     {
                         TextRange TR2 = p2.AppendText(data[r][c]);
                         p2.Format.HorizontalAlignment = HorizontalAlignment.Left;
 
-                        //Set data format
+                     
                         TR2.CharacterFormat.FontName = "Times New Roman";
                         TR2.CharacterFormat.FontSize = 12;
 
                     }
                 }
+            }
+            Paragraph paragraph = range.OwnerParagraph;
+
+            // Thêm table ngay sau placeholder
+            int index = paragraph.OwnerTextBody.ChildObjects.IndexOf(paragraph);
+            if (index >= 0)
+            {
+                paragraph.OwnerTextBody.ChildObjects.Insert(index, table);
             }
 
             range.OwnerParagraph.ChildObjects.Remove(range);

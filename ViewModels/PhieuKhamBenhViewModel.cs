@@ -43,7 +43,13 @@ namespace WebApplication7.ViewModel
 
         public string DienThoaiNguoiBenh { get; set; }
 
+        public bool CheckKhanCap { get; set; }
         public string TomTacKetQuaLamSan { get; set; }
+
+        public string SoDienThoaiNguoiNha {  get; set; }
+
+        public DateTime HanBaoHiem {  get; set; }
+
         public List<string> ChanDoanSoBo { get; set; }
         public ChiDinhCanLamSan ChiDinhCanLamSan { get; set; }
 

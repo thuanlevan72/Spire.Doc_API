@@ -15,6 +15,7 @@
         public static string MA_NB = "${MA_NB}";
         public static string SO_BAO_HIEM_Y_TE = "${SoBHYT}";
         public static string NGHE_NGHIEP = "${NgheNghiep}";
+        public static string HAN_BAO_HIEM = "${HanBaoHiem}";
         public static string NOI_LAM_VIEC = "${NoiLamViec}";
         public static string SO_DIEN_THOAI_NGUOI_NHA = "${SoDienThoaiNguoiNha}";
         public static string THONG_TIN_NGUOI_NHA = "${ThongTinNguoiNha}";
@@ -24,7 +25,8 @@
         public static string NOI_DUNG_GHI_CHU = "${NOIDUNGGHICHU}";
         public static string NGAY_TAO = "${NgayTao}";
         public static string NGUOI_LAP_DON = "${NguoiLapDon}";
-
+        public static string CHECK_THUONG = "${CheckThuong}";
+        public static string CHECK_KHAN_CAP = "${CheckKhanCap}";
         public static string LY_DO_KHAM_BENH = "${LyDoKhambenh}";
         public static string TIEN_SU_BAN_THAN = "${TienSuBanThan}";
         public static string TIEN_SU_GIA_DINH = "${TienSuGiaDinh}";
@@ -39,6 +41,7 @@
 
 
         public static string TABLE_BENH_CHINH = "${TableBenhChinh}";
+
 
 
         public static string MANH_DAP = "${ManhDap}";
