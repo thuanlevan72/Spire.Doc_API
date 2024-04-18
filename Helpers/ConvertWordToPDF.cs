@@ -340,7 +340,7 @@ namespace WebApplication7.Helpers
             }
             Paragraph paragraph = range.OwnerParagraph;
 
-            Paragraph newParagraph = new Paragraph(_doc);
+            //Paragraph newParagraph = new Paragraph(_doc);
             
 
             //// Add the new paragraph at the position of the placeholder

@@ -2,56 +2,53 @@
 {
     public class PhieuKhamBenhKEY
     {
-        public static string TEN_SO_Y_TE = "${TEN_SO_Y_TE}";
-        public static string TEN_BENH_VIEN = "${TEN_BENH_VIEN}";
-        public static string TEN_NGUOI_BENH = "${TenNguoiBenh}";
-        public static string NGAY_SINH = "${SinhNgay}";
-        public static string TUOI = "${Tuoi}";
-        public static string GIOI_TINH = "${GioiTinh}";
-        public static string QUOC_TICH = "${QuocTich}";
-        public static string DAN_TOC = "${DanToc}";
-        public static string DIA_CHI = "${DiaChi}";
-        public static string SO_PHIEU = "${SoPhieu}";
-        public static string MA_NB = "${MA_NB}";
-        public static string SO_BAO_HIEM_Y_TE = "${SoBHYT}";
-        public static string NGHE_NGHIEP = "${NgheNghiep}";
-        public static string HAN_BAO_HIEM = "${HanBaoHiem}";
-        public static string NOI_LAM_VIEC = "${NoiLamViec}";
-        public static string SO_DIEN_THOAI_NGUOI_NHA = "${SoDienThoaiNguoiNha}";
-        public static string THONG_TIN_NGUOI_NHA = "${ThongTinNguoiNha}";
-        public static string THOI_GIAN_DEN_KHAM = "${ThoiGianDenKham}";
-        public static string THOI_GIAN_BAT_DAU_KHAM = "${ThoiGianBatDauKham}";
-        public static string NGUOI_GIOI_THIEU = "${NguoiGioiThieu}";
-        public static string NOI_DUNG_GHI_CHU = "${NOIDUNGGHICHU}";
-        public static string NGAY_TAO = "${NgayTao}";
-        public static string NGUOI_LAP_DON = "${NguoiLapDon}";
-        public static string CHECK_THUONG = "${CheckThuong}";
-        public static string CHECK_KHAN_CAP = "${CheckKhanCap}";
-        public static string LY_DO_KHAM_BENH = "${LyDoKhambenh}";
-        public static string TIEN_SU_BAN_THAN = "${TienSuBanThan}";
-        public static string TIEN_SU_GIA_DINH = "${TienSuGiaDinh}";
-        public static string BENH_SU = "${BenhSu}";
-        public static string KHAM_TOAN_THAN = "${KhamToanThan}";
-        public static string KHAM_BO_PHAN = "${KhamBoPhan}";
-        public static string CHUAN_DOAN_SO_BO = "${ChuanDoanSoBo}";
-        public static string CHI_DINH_XET_NGHIEM = "${ChiDinhXetNghiem}";
-        public static string TDCN = "${TDCN}";
-        public static string TOM_TAC_KET_QUA = "${TomTacKetQua}";
-        public static string NOI_DUNG_SU_CHI = "${NoiDungSuChi}";
+        public const string TEN_SO_Y_TE = "${TEN_SO_Y_TE}";
+        public const string TEN_BENH_VIEN = "${TEN_BENH_VIEN}";
+        public const string TEN_NGUOI_BENH = "${TenNguoiBenh}";
+        public const string NGAY_SINH = "${SinhNgay}";
+        public const string TUOI = "${Tuoi}";
+        public const string GIOI_TINH = "${GioiTinh}";
+        public const string QUOC_TICH = "${QuocTich}";
+        public const string DAN_TOC = "${DanToc}";
+        public const string DIA_CHI = "${DiaChi}";
+        public const string SO_PHIEU = "${SoPhieu}";
+        public const string MA_NB = "${MA_NB}";
+        public const string SO_BAO_HIEM_Y_TE = "${SoBHYT}";
+        public const string NGHE_NGHIEP = "${NgheNghiep}";
+        public const string HAN_BAO_HIEM = "${HanBaoHiem}";
+        public const string NOI_LAM_VIEC = "${NoiLamViec}";
+        public const string SO_DIEN_THOAI_NGUOI_NHA = "${SoDienThoaiNguoiNha}";
+        public const string THONG_TIN_NGUOI_NHA = "${ThongTinNguoiNha}";
+        public const string THOI_GIAN_DEN_KHAM = "${ThoiGianDenKham}";
+        public const string THOI_GIAN_BAT_DAU_KHAM = "${ThoiGianBatDauKham}";
+        public const string NGUOI_GIOI_THIEU = "${NguoiGioiThieu}";
+        public const string NOI_DUNG_GHI_CHU = "${NOIDUNGGHICHU}";
+        public const string NGAY_TAO = "${NgayTao}";
+        public const string NGUOI_LAP_DON = "${NguoiLapDon}";
+        public const string CHECK_THUONG = "${CheckThuong}";
+        public const string CHECK_KHAN_CAP = "${CheckKhanCap}";
+        public const string LY_DO_KHAM_BENH = "${LyDoKhambenh}";
+        public const string TIEN_SU_BAN_THAN = "${TienSuBanThan}";
+        public const string TIEN_SU_GIA_DINH = "${TienSuGiaDinh}";
+        public const string BENH_SU = "${BenhSu}";
+        public const string KHAM_TOAN_THAN = "${KhamToanThan}";
+        public const string KHAM_BO_PHAN = "${KhamBoPhan}";
+        public const string CHUAN_DOAN_SO_BO = "${ChuanDoanSoBo}";
+        public const string CHI_DINH_XET_NGHIEM = "${ChiDinhXetNghiem}";
+        public const string TDCN = "${TDCN}";
+        public const string TOM_TAC_KET_QUA = "${TomTacKetQua}";
+        public const string NOI_DUNG_SU_CHI = "${NoiDungSuChi}";
+        public const string IMAGE_BARCODE = "${Image_Barcode}";
+        public const string TABLE_BENH_CHINH = "${TableBenhChinh}";
 
-        public static string IMAGE_BARCODE = "${Image_Barcode}";
-        public static string TABLE_BENH_CHINH = "${TableBenhChinh}";
-
-
-
-        public static string MANH_DAP = "${ManhDap}";
-        public static string NHIET_DO = "${NhietDo}";
-        public static string HUYET_AP = "${HuyetAp}";
-        public static string NHIP_THO = "${NhipTho}";
-        public static string CAN_NANG = "${CanNang}";
-        public static string CHIEU_CAO = "${ChieuCao}";
-        public static string BMI = "${BMI}";
-        public static string SP02 = "${SP02}";
+        public const string MANH_DAP = "${ManhDap}";
+        public const string NHIET_DO = "${NhietDo}";
+        public const string HUYET_AP = "${HuyetAp}";
+        public const string NHIP_THO = "${NhipTho}";
+        public const string CAN_NANG = "${CanNang}";
+        public const string CHIEU_CAO = "${ChieuCao}";
+        public const string BMI = "${BMI}";
+        public const string SP02 = "${SP02}";
 
     }
 }
