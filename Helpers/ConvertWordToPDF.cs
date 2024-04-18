@@ -7,14 +7,7 @@ using WebApplication7.Commons;
 using WebApplication7.ViewModel;
 using Spire.Barcode;
 using System.Drawing;
-using System;
 using System.Globalization;
-using System.Reflection;
-
-
-
-
-
 
 namespace WebApplication7.Helpers
 {
@@ -27,6 +20,7 @@ namespace WebApplication7.Helpers
             _doc = new Document();
             _builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
         }
+        #region chuyển đổi danh sách chuỗi thành một chuỗi duy nhất, với mỗi phần tử được phân tách bằng dòng mới
         public string GetListString(List<string> data)
         {
             StringBuilder noiDung = new StringBuilder();
@@ -44,6 +38,8 @@ namespace WebApplication7.Helpers
 
             return noiDung.ToString();
         }
+        #endregion
+        #region tạo một hình ảnh barcode mã vạch từ một chuỗi mã
         private Image CreateBarcode(string code)
         {
             BarcodeSettings settings = new BarcodeSettings();
@@ -58,6 +54,8 @@ namespace WebApplication7.Helpers
             Image barcodeImg = generator.GenerateImage();
             return barcodeImg;
         }
+        #endregion
+        #region xử lý việc chèn hình ảnh vào văn bản
         private void HandleImages(TextSelection selection, Image image)
         {
             TextRange range = selection.GetAsOneRange();
@@ -78,6 +76,8 @@ namespace WebApplication7.Helpers
             paragraph.ChildObjects.Insert(index, picture);
             paragraph.ChildObjects.Remove(range);
         }
+        #endregion
+        #region cắt hình ảnh để phù hợp với kích thước đã cho
         public static Image CropImageToFrame(Image img, Size size)
         {
             if (img.Height < size.Height && img.Width < size.Width)
@@ -92,6 +92,8 @@ namespace WebApplication7.Helpers
             }
             return res;
         }
+        #endregion
+        #region xử lý việc chèn checkbox vào văn bản
         public void HandleInsertCheckBox(PhieuKhamBenhViewModel data)
         {
             // find insert check box
@@ -160,12 +162,11 @@ namespace WebApplication7.Helpers
                 paragraph.ChildObjects.Remove(textSelection.GetAsOneRange());
             }
         }
+        #endregion
+        #region tìm và thay thế văn bản trong tài liệu Word
         public void ReplaceTextInWord(PhieuKhamBenhViewModel data)
         {
             var configuration = _builder.Build();
-            var hashData = configuration.GetSection("HashData");
-
-
             string noiDungChuanDoanSoBo = GetListString(data.ChuanDoanSoBo);
             string noiDungCacBoPhan = GetListString(data.KhamLamSan.CacBoPhan);
             string noiDungGhiChu = GetListString(data.GhiChus);
@@ -175,7 +176,7 @@ namespace WebApplication7.Helpers
             _doc.Replace(PhieuKhamBenhKEY.DIA_CHI, data.DiaChi, false, true);
             _doc.Replace(PhieuKhamBenhKEY.NGAY_SINH, data.NgaySinh, false, true);
             _doc.Replace(PhieuKhamBenhKEY.DAN_TOC, data.DanToc, false, true);
-            _doc.Replace(PhieuKhamBenhKEY.TEN_NGUOI_BENH, data.TenNguoiBenh, false, true);
+            _doc.Replace(PhieuKhamBenhKEY.TEN_NGUOI_BENH, data.TenNguoiBenh.ToUpper(), false, true);
             _doc.Replace(PhieuKhamBenhKEY.NGHE_NGHIEP, data.NgheNghiep, false, true);
             _doc.Replace(PhieuKhamBenhKEY.QUOC_TICH, data.QuocTich, false, true);
             _doc.Replace(PhieuKhamBenhKEY.SO_PHIEU, data.SoPhieu, false, true);
@@ -215,13 +216,10 @@ namespace WebApplication7.Helpers
             _doc.Replace(PhieuKhamBenhKEY.TEN_SO_Y_TE, Constants.SoYTE, false, true);
             _doc.Replace(PhieuKhamBenhKEY.TEN_BENH_VIEN, Constants.TenBenhVien, false, true);
         }
+        #endregion
         public byte[] ReplaceTextInWord(PhieuKhamBenhViewModel data, string path)
         {
-            var configuration = _builder.Build();
-            var hashData = configuration.GetSection("HashData");
-
             _doc.LoadFromFile(path);
-
             Image barcodeImg = CreateBarcode(data.MA_NB);
             TextSelection[] selections = _doc.FindAllString(PhieuKhamBenhKEY.IMAGE_BARCODE, false, true);
             HandleImages(selections[0], barcodeImg);
@@ -244,7 +242,7 @@ namespace WebApplication7.Helpers
                 return result;
             }
         }
-        #region chuyển file DOCX SANG Pdf
+        #region chuyển file DOCX SANG PDF
         public (MemoryStream, string) ConvertDocumentToPdf(byte[] fileData)
         {
             // Create a MemoryStream from the fileData
@@ -272,6 +270,7 @@ namespace WebApplication7.Helpers
             return (memory, fileName);
         }
         #endregion
+        #region chuyển dữ liệu và thêm vào table
         private void AddTableToDoc(string placeholder, ChanDoanXacDinh inputData)
         {
             String[] Header = { $"- Bệnh chính: {inputData.BenhChinh.TenBenh}", $"Mã ICD: {inputData.BenhChinh.ICD_CODE}" };
@@ -324,7 +323,7 @@ namespace WebApplication7.Helpers
                 for (int c = 0; c < data[r].Length; c++)
                 {
                     table.Rows[r].Cells[c].CellFormat.Borders.BorderType = Spire.Doc.Documents.BorderStyle.None;
-                    DataRow.Cells[c].CellFormat.VerticalAlignment = VerticalAlignment.Middle;
+                    DataRow.Cells[c].CellFormat.VerticalAlignment = VerticalAlignment.Top;
                     Paragraph p2 = DataRow.Cells[c].AddParagraph();
 
                     if (data[r][c] != null)
@@ -351,7 +350,8 @@ namespace WebApplication7.Helpers
             paragraph.OwnerTextBody.ChildObjects.Remove(paragraph);
 
         }
-        public void CreateTableFromHTMLs(string placeholder, ChanDoanXacDinh inputData)
+        #endregion
+        public void CreateTableFromHTML(string placeholder, ChanDoanXacDinh inputData)
         {
             string benhPhuHTML = "";
             for (int i = 0; i < inputData.benhPhu.Count; i++)

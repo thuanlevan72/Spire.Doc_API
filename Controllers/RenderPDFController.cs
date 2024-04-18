@@ -37,15 +37,21 @@ namespace WebApplication7.Controllers
         [HttpPost("PhieuKhamBenh")]
         public IActionResult RenderPhieuKhamBenh([FromBody] PhieuKhamBenhViewModel value)
         {
-            string path = Constants.PDFPullTestPath;
-            byte[] fileContent = _convertWordToPDF.ReplaceTextInWord(value, path);
+            try
+            {
+                string path = Constants.PDFPullTestPath;
+                byte[] fileContent = _convertWordToPDF.ReplaceTextInWord(value, path);
 
+                var (memory, fileName) = _convertWordToPDF.ConvertDocumentToPdf(fileContent);
+                return File(memory, "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex);
+            }
 
-            var (memory, fileName) = _convertWordToPDF.ConvertDocumentToPdf(fileContent);
-
-         
             // Return the PDF file to the client.
-            return File(memory, "application/pdf", fileName);
+            
         }
 
         // PUT api/<RenderPDFController>/5
