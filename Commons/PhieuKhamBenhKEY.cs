@@ -39,7 +39,7 @@
         public static string TOM_TAC_KET_QUA = "${TomTacKetQua}";
         public static string NOI_DUNG_SU_CHI = "${NoiDungSuChi}";
 
-
+        public static string IMAGE_BARCODE = "${Image_Barcode}";
         public static string TABLE_BENH_CHINH = "${TableBenhChinh}";
 
 

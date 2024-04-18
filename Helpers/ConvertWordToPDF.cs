@@ -9,6 +9,7 @@ using Spire.Barcode;
 using System.Drawing;
 using System;
 using System.Globalization;
+using System.Reflection;
 
 
 
@@ -26,29 +27,12 @@ namespace WebApplication7.Helpers
             _doc = new Document();
             _builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
         }
-        private string GetChuanDoanSoBo(List<string> chuanDoanSoBos)
-        {
-            StringBuilder noiDungChuanDoanSoBo = new StringBuilder();
-            for (int i = 0; i < chuanDoanSoBos.Count; i++)
-            {
-                if (i == chuanDoanSoBos.Count - 1)
-                {
-                    noiDungChuanDoanSoBo.Append($"- {chuanDoanSoBos[i]}");
-                }
-                else
-                {
-                    noiDungChuanDoanSoBo.Append($"- {chuanDoanSoBos[i]} \n");
-                }
-            }
-          
-            return noiDungChuanDoanSoBo.ToString();
-        }
         public string GetListString(List<string> data)
         {
             StringBuilder noiDung = new StringBuilder();
-            for(int i = 0; i< data.Count; i++)
+            for (int i = 0; i < data.Count; i++)
             {
-               if(i == data.Count - 1)
+                if (i == data.Count - 1)
                 {
                     noiDung.Append($"{data[i]}");
                 }
@@ -57,10 +41,9 @@ namespace WebApplication7.Helpers
                     noiDung.Append($"{data[i]} \n");
                 }
             }
-          
+
             return noiDung.ToString();
         }
-
         private Image CreateBarcode(string code)
         {
             BarcodeSettings settings = new BarcodeSettings();
@@ -70,7 +53,7 @@ namespace WebApplication7.Helpers
             settings.ShowText = false;
             settings.ImageWidth = 10;
             settings.ImageHeight = 10;
-            
+
             BarCodeGenerator generator = new BarCodeGenerator(settings);
             Image barcodeImg = generator.GenerateImage();
             return barcodeImg;
@@ -182,15 +165,10 @@ namespace WebApplication7.Helpers
             var configuration = _builder.Build();
             var hashData = configuration.GetSection("HashData");
 
-            StringBuilder noiDungGhiChu = new StringBuilder();
 
-            data.GhiChus.ForEach(title =>
-            {
-                noiDungGhiChu.Append($" {title} \n");
-
-            });
             string noiDungChuanDoanSoBo = GetListString(data.ChuanDoanSoBo);
             string noiDungCacBoPhan = GetListString(data.KhamLamSan.CacBoPhan);
+            string noiDungGhiChu = GetListString(data.GhiChus);
             _doc.Replace(PhieuKhamBenhKEY.SO_DIEN_THOAI_NGUOI_NHA, data.SoDienThoaiNguoiNha, false, true);
             _doc.Replace(PhieuKhamBenhKEY.HAN_BAO_HIEM, data.HanBaoHiem.ToString("dd/MM/yyyy"), false, true);
             _doc.Replace(PhieuKhamBenhKEY.NOI_LAM_VIEC, data.NoiLamViec, false, true);
@@ -233,7 +211,7 @@ namespace WebApplication7.Helpers
             _doc.Replace(PhieuKhamBenhKEY.NHIP_THO, data.ThongSoSucKhoe.NhipTho.ToString(), false, true);
             _doc.Replace(PhieuKhamBenhKEY.CHIEU_CAO, data.ThongSoSucKhoe.ChieuCao.ToString(), false, true);
             _doc.Replace(PhieuKhamBenhKEY.SP02, data.ThongSoSucKhoe.SPO2.ToString(), false, true);
-            _doc.Replace(PhieuKhamBenhKEY.NOI_DUNG_GHI_CHU, noiDungGhiChu.ToString(), false, true);
+            _doc.Replace(PhieuKhamBenhKEY.NOI_DUNG_GHI_CHU, noiDungGhiChu, false, true);
             _doc.Replace(PhieuKhamBenhKEY.TEN_SO_Y_TE, Constants.SoYTE, false, true);
             _doc.Replace(PhieuKhamBenhKEY.TEN_BENH_VIEN, Constants.TenBenhVien, false, true);
         }
@@ -241,16 +219,21 @@ namespace WebApplication7.Helpers
         {
             var configuration = _builder.Build();
             var hashData = configuration.GetSection("HashData");
-            
+
             _doc.LoadFromFile(path);
-         
+
             Image barcodeImg = CreateBarcode(data.MA_NB);
-            TextSelection[] selections = _doc.FindAllString("${Image_Barcode}", false, true);
+            TextSelection[] selections = _doc.FindAllString(PhieuKhamBenhKEY.IMAGE_BARCODE, false, true);
             HandleImages(selections[0], barcodeImg);
             HandleInsertCheckBox(data);
             // Replace Text In Word
             ReplaceTextInWord(data);
-            AddTableToDoc(PhieuKhamBenhKEY.TABLE_BENH_CHINH,data.chanDoanXacDinh);
+            AddTableToDoc(PhieuKhamBenhKEY.TABLE_BENH_CHINH, data.chanDoanXacDinh);
+            //CreateTableFromHTMLs(PhieuKhamBenhKEY.TABLE_BENH_CHINH, data.chanDoanXacDinh);
+
+
+            string outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Temp", "Output.docx");
+            _doc.SaveToFile(outputFilePath, FileFormat.Docx2016);
             using (MemoryStream stream = new MemoryStream())
             {
                 _doc.SaveToStream(stream, FileFormat.Docx2016);
@@ -274,9 +257,9 @@ namespace WebApplication7.Helpers
             _doc.Dispose();
 
             string fileName = @"Document-" + DateTime.Now.ToString("dd-MM-yyyy") + "-" + Guid.NewGuid().ToString() + @"-Converted.pdf";
-            string directoryPath = @"C:\Users\Admin\Source\Repos\Spire.Doc_API\PDFResult\"; // Thay thế bằng đường dẫn thư mục mà bạn muốn lưu file vào
+
             //string directoryPath = @"C:\Users\thuan\source\repos\WebApplication7\WebApplication7\PDFResult\";
-            string fullPath = Path.Combine(directoryPath, fileName);
+            string fullPath = Path.Combine(Constants.PDFResultPath, fileName);
 
             // Lưu file vào thư mục
             File.WriteAllBytes(fullPath, stream.ToArray());
@@ -297,7 +280,7 @@ namespace WebApplication7.Helpers
             {
                 new String[] { "- Bệnh kèm theo: ", null }
             };
-            for (int i = 0;i< inputData.benhPhu.Count; i++)
+            for (int i = 0; i < inputData.benhPhu.Count; i++)
             {
                 tempList.Add(new String[] { $"{inputData.benhPhu[i].TenBenh}", $"Mã ICD: {inputData.benhPhu[i].ICD_CODE}" });
             }
@@ -306,18 +289,16 @@ namespace WebApplication7.Helpers
             TextSelection selection = _doc.FindString(placeholder, false, true);
             TextRange range = selection.GetAsOneRange();
 
-
-
             Table table = range.OwnerParagraph.OwnerTextBody.AddTable(true);
 
             table.ResetCells(data.Length + 1, Header.Length);
 
             TableRow FRow = table.Rows[0];
 
-            FRow.Height = 23;
- 
-            FRow.Cells[0].Width = (float)(table.Width * 0.7);
-            FRow.Cells[1].Width = (float)(table.Width * 0.3);
+            FRow.Height = 20;
+
+            FRow.Cells[0].Width = (float)(table.Width * 0.80);
+            FRow.Cells[1].Width = (float)(table.Width * 0.20);
 
             for (int i = 0; i < Header.Length; i++)
             {
@@ -328,7 +309,7 @@ namespace WebApplication7.Helpers
                 TextRange TR = p.AppendText(Header[i]);
                 TR.CharacterFormat.FontName = "Times New Roman";
                 TR.CharacterFormat.FontSize = 12;
-              
+
             }
             table.TableFormat.Borders.BorderType = Spire.Doc.Documents.BorderStyle.None;
             for (int r = 0; r < data.Length; r++)
@@ -336,22 +317,22 @@ namespace WebApplication7.Helpers
                 TableRow DataRow = table.Rows[r + 1];
                 DataRow.Height = 15;
 
-              
-                DataRow.Cells[0].Width = (float)(table.Width * 0.7);
-                DataRow.Cells[1].Width = (float)(table.Width * 0.3);
+
+                DataRow.Cells[0].Width = (float)(table.Width * 0.80);
+                DataRow.Cells[1].Width = (float)(table.Width * 0.20);
 
                 for (int c = 0; c < data[r].Length; c++)
                 {
                     table.Rows[r].Cells[c].CellFormat.Borders.BorderType = Spire.Doc.Documents.BorderStyle.None;
                     DataRow.Cells[c].CellFormat.VerticalAlignment = VerticalAlignment.Middle;
                     Paragraph p2 = DataRow.Cells[c].AddParagraph();
-                   
+
                     if (data[r][c] != null)
                     {
                         TextRange TR2 = p2.AppendText(data[r][c]);
                         p2.Format.HorizontalAlignment = HorizontalAlignment.Left;
 
-                     
+
                         TR2.CharacterFormat.FontName = "Times New Roman";
                         TR2.CharacterFormat.FontSize = 12;
 
@@ -360,14 +341,74 @@ namespace WebApplication7.Helpers
             }
             Paragraph paragraph = range.OwnerParagraph;
 
-            // Thêm table ngay sau placeholder
-            int index = paragraph.OwnerTextBody.ChildObjects.IndexOf(paragraph);
-            if (index >= 0)
+            Paragraph newParagraph = new Paragraph(_doc);
+            
+
+            //// Add the new paragraph at the position of the placeholder
+            //paragraph.OwnerTextBody.ChildObjects.Insert(0, newParagraph);
+
+            // Now remove the paragraph containing the placeholder
+            paragraph.OwnerTextBody.ChildObjects.Remove(paragraph);
+
+        }
+        public void CreateTableFromHTMLs(string placeholder, ChanDoanXacDinh inputData)
+        {
+            string benhPhuHTML = "";
+            for (int i = 0; i < inputData.benhPhu.Count; i++)
             {
-                paragraph.OwnerTextBody.ChildObjects.Insert(index, table);
+                benhPhuHTML += $@"<tr>
+            <td style=""width: 70%"">{inputData.benhPhu[i].TenBenh}</td>
+            <td style=""width: 30%"">Mã ICD: {inputData.benhPhu[i].ICD_CODE}</td>
+            </tr>";
             }
+            string htmlString = $@"
+            <table style=""width: 100%;  font-size: 16px; "">
+
+            <tbody>
+            <tr>
+            <td style=""width: 70%"">- Bệnh chính: {inputData.BenhChinh.TenBenh}</td>
+            <td style=""width: 30%"">Mã ICD: {inputData.BenhChinh.ICD_CODE}</td>
+            </tr>
+            <tr>
+            <td style=""width: 70%"">- Bệnh kèm theo: </td>
+            <td style=""width: 30%""></td>
+            </tr>
+            {benhPhuHTML}
+            </tbody>
+            </table>";
+
+            //Create a Word document
+
+
+            //Add a section
+            TextSelection selection = _doc.FindString(placeholder, false, true);
+            TextRange range = selection.GetAsOneRange();
+
+            //Add a paragraph and append html string
+            range.Text = "";
+            range.OwnerParagraph.AppendHTML(htmlString);
+            // Apply the style to each TextRange in the paragraph
+            for (int i = 0; i < range.OwnerParagraph.ChildObjects.Count; i++)
+            {
+                if (range.OwnerParagraph.ChildObjects[i] is TextRange)
+                {
+                    TextRange text = (TextRange)range.OwnerParagraph.ChildObjects[i];
+                    text.CharacterFormat.Bold = false;
+                }
+            }
+            //Paragraph paragraph = range.OwnerParagraph;
+            //int index = paragraph.OwnerTextBody.ChildObjects.IndexOf(paragraph);
+            //if (index >= 0)
+            //{
+            //    paragraph.OwnerTextBody.ChildObjects.Insert(index, table);
+            //}
 
             range.OwnerParagraph.ChildObjects.Remove(range);
+
+
+
         }
     }
+
+
 }

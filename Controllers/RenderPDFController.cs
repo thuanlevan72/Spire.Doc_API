@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Spire.Doc;
+using WebApplication7.Commons;
 using WebApplication7.Helpers;
 using WebApplication7.ViewModel;
 
@@ -36,7 +37,7 @@ namespace WebApplication7.Controllers
         [HttpPost("PhieuKhamBenh")]
         public IActionResult RenderPhieuKhamBenh([FromBody] PhieuKhamBenhViewModel value)
         {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "DocxTemplates", "Phieu-kham-vao-vien-v2_20240416.docx");
+            string path = Constants.PDFPullTestPath;
             byte[] fileContent = _convertWordToPDF.ReplaceTextInWord(value, path);
 
 
